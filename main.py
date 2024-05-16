@@ -7,6 +7,8 @@ import uvicorn
 from dotenv import load_dotenv
 import os
 
+from starlette.responses import FileResponse
+
 
 class CompanyInformationRetriever:
     base_url = "https://api.company-information.service.gov.uk/company/"
@@ -100,6 +102,8 @@ class CompanyAPI:
             description="Retrieve details for multiple companies, using a comma-separated list of company numbers.",
             response_description="The details of each company, including its name, company number, the SIC codes for its activities and their descriptions; or an error entry for any companies that failed",
         )
+        self.app.add_api_route("/privacy-policy", self.get_privacy_policy, methods=["GET"], summary="Privacy Policy",
+                               description="Return the privacy policy HTML page.")
 
     def get_company_details(self, company_id: str):
         try:
@@ -135,6 +139,10 @@ class CompanyAPI:
     @staticmethod
     def read_root():
         return {"message": "Company lookup service is working - see /docs for Swagger documentation"}
+
+    @staticmethod
+    def get_privacy_policy():
+        return FileResponse('privacy-policy.html', media_type='text/html')
 
 
 if __name__ == '__main__':
