@@ -61,6 +61,7 @@ class CompanyLookup:
         self.sic_code_lookup = sic_code_lookup
 
     def lookup_company(self, company_number):
+        company_number = company_number.strip().zfill(8)
         (company_name, company_number, sic_codes) = self.company_information_retriever.retrieve_company(company_number)
         sic_descriptions = [self.sic_code_lookup.get_description(code) for code in sic_codes]
         return CompanyInformation(
