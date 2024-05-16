@@ -6,8 +6,8 @@ To use:
 
 * Register for a Companies House API key via https://developer.company-information.service.gov.uk/
 * Add the key to a .env file with the format API_KEY=xxx
-* Create a virtual environment with `python -m venv .venv`, and switch to it with `.venv/bin/activate`
-* Install requirements with `pip install -r requirements.txt` then exit
+* Create a virtual environment with `python -m venv .venv`, and switch to it with `source .venv/bin/activate`
+* Install requirements with `pip install -r requirements.txt`
 * Run with `.venv/bin/python main.py`
 * Go to http://localhost:8000/docs
 
