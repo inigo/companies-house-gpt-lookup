@@ -11,6 +11,15 @@ To use:
 * Run with `.venv/bin/python main.py`
 * Go to http://localhost:8000/docs
 
+## GPT setup
+
+To set up in ChatGPT:
+
+* Set it running somewhere publicly available (you may need to use the ROOT_PATH variable to specify the public URL)
+* Within a (paid-for) ChatGPT account, create a new GPT
+* In the Actions, create an action, and import the schema from (your url)/openapi.json
+* In the Prompt, tell ChatGPT to use the action when it sees a company number.
+
 ## License
 Copyright (C) 2024 Inigo Surguy
 
