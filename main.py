@@ -55,6 +55,11 @@ class CompanyInformation(BaseModel):
     sic_descriptions: list[str]
 
 
+class CompanyInformationError(BaseModel):
+    company_number: str
+    error: str
+
+
 class CompanyLookup:
     def __init__(self, company_information_retriever, sic_code_lookup):
         self.company_information_retriever = company_information_retriever
@@ -90,10 +95,10 @@ class CompanyAPI:
             "/companies/",
             self.get_companies_details,
             methods=["GET"],
-            response_model=list[CompanyInformation],
+            response_model=list[CompanyInformation | CompanyInformationError],
             summary="Get Multiple Company Details",
             description="Retrieve details for multiple companies, using a comma-separated list of company numbers.",
-            response_description="The details of each company, including its name, company number, the SIC codes for its activities and their descriptions.",
+            response_description="The details of each company, including its name, company number, the SIC codes for its activities and their descriptions; or an error entry for any companies that failed",
         )
 
     def get_company_details(self, company_id: str):
@@ -109,11 +114,23 @@ class CompanyAPI:
                                   pattern=r'^([a-zA-Z0-9]+,)*[a-zA-Z0-9]+$',
                                   description="Comma-separated list of company IDs")
                               ):
-        try:
-            company_id_list = company_ids.split(',')
-            return [self.company_lookup.lookup_company(company_number) for company_number in company_id_list]
-        except requests.HTTPError as e:
-            raise HTTPException(status_code=e.response.status_code, detail=str(e))
+        company_id_list = company_ids.split(',')
+        results = []
+
+        for company_number in company_id_list:
+            try:
+                company_info = self.company_lookup.lookup_company(company_number)
+                results.append(company_info)
+            except requests.HTTPError as e:
+                results.append(CompanyInformationError(
+                    company_number=company_number,
+                    error=str(e)
+                ))
+
+        if not results:
+            raise HTTPException(status_code=400, detail="All company number lookups failed")
+
+        return results
 
     @staticmethod
     def read_root():
