@@ -71,9 +71,9 @@ class CompanyLookup:
 
 
 class CompanyAPI:
-    def __init__(self, company_lookup: CompanyLookup):
+    def __init__(self, company_lookup: CompanyLookup, root_path: str = "/"):
         self.company_lookup = company_lookup
-        self.app = FastAPI()
+        self.app = FastAPI(root_path=root_path)
 
         self.app.get("/")(self.read_root)
         self.app.add_api_route(
@@ -124,12 +124,13 @@ if __name__ == '__main__':
     port = os.getenv("PORT") or 8000
     # API key provided by Companies House - see https://developer.company-information.service.gov.uk/
     api_key = os.getenv("API_KEY")
+    root_path = os.getenv("ROOT_PATH") or ""
 
     company_retriever = CompanyInformationRetriever(api_key)
     # CSV is downloaded from https://assets.publishing.service.gov.uk/media/5a7f8639e5274a2e87db65e1/SIC07_CH_condensed_list_en.csv/
     sic_lookup = SICCodeLookup('SIC07_CH_condensed_list_en.csv')
     company_lookup = CompanyLookup(company_retriever, sic_lookup)
-    company_api = CompanyAPI(company_lookup)
+    company_api = CompanyAPI(company_lookup, root_path)
 
     app = company_api.app
     uvicorn.run(app, host="0.0.0.0", port=port)
